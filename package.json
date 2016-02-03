@@ -1,0 +1,25 @@
+{
+  "name": "package",
+  "version": "0.0.0",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "napa":"*",
+    "gulp":"*",
+    "gulp-plumber":"*",
+    "gulp-rename":"*",
+    "gulp-compass":"*",
+    "gulp-browserify":"*",
+    "gulp-jade":"*",
+    "gulp-ng-annotate":"*",
+    "gulp-imagemin":"*",
+    "gulp-connect":"*",
+    "gulp-minify-css":"*",
+    "gulp-uglify":"*",
+    "browserify":"*"
+    
+    ,"coffeeify":"*"
+    
+  }
+   
+}
