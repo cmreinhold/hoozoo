@@ -16,6 +16,11 @@ var jade = require('gulp-jade');
 var imagemin = require('gulp-imagemin');
 var annotate = require('gulp-ng-annotate')
 
+var servers = {
+   test: 'localhost', 
+   dist: '46.101.23.228' 
+}
+
 var p = {
   html: {
     src:'*.html',
@@ -39,15 +44,6 @@ var p = {
     dest: 'build/' 
   }
 }
-
-// Livereload
-gulp.task('connect', function() {
-  connect.server({
-    root:'build',
-    livereload: true,
-    port: 8000
-  })
-})
 
 // Compass
 gulp.task('compass', function() {
@@ -125,6 +121,20 @@ gulp.task('prettify', function() {
     .pipe(prettify({indent_size: 2}))
     .pipe(gulp.dest(p.html.dest))
 });
+
+
+// Livereload
+gulp.task('connect', function() {
+  connect.server({
+    root:'build',
+    livereload: true,
+    port: 8000,
+    host: servers.dist,
+    open: {
+      browser: 'chrome' // if not working OS X browser: 'Google Chrome'
+    }
+  })
+})
 
 // Go
 gulp.task('default', ['connect','jade', 'compass', 'browserify', 'images', 'prettify','watch'], function() {
