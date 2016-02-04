@@ -1,0 +1,19 @@
+{
+  "name": "hoozoo",
+  "description": "",
+  "main": "",
+  "authors": [
+    "creinhold <christian.reinhold@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cmreinhold/hoozoo",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

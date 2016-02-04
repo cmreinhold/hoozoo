@@ -1,25 +1,41 @@
 {
-  "name": "package",
+  "name": "hoozoo",
   "version": "0.0.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "napa":"*",
-    "gulp":"*",
-    "gulp-plumber":"*",
-    "gulp-rename":"*",
-    "gulp-compass":"*",
-    "gulp-browserify":"*",
-    "gulp-jade":"*",
-    "gulp-ng-annotate":"*",
-    "gulp-imagemin":"*",
-    "gulp-connect":"*",
-    "gulp-minify-css":"*",
-    "gulp-uglify":"*",
-    "browserify":"*"
-    
-    ,"coffeeify":"*"
-    
-  }
-   
+    "browserify": "*",
+    "coffeeify": "*",
+    "gulp": "*",
+    "gulp-browserify": "^0.5.1",
+    "gulp-compass": "*",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "*",
+    "gulp-imagemin": "*",
+    "gulp-jade": "*",
+    "gulp-minify-css": "*",
+    "gulp-ng-annotate": "*",
+    "gulp-plumber": "*",
+    "gulp-prettify": "^0.4.0",
+    "gulp-rename": "*",
+    "gulp-uglify": "*",
+    "gulp-util": "^3.0.7",
+    "jquery": "^2.2.0",
+    "mustache": "^2.2.1",
+    "napa": "*"
+  },
+  "description": "",
+  "main": "Gulpfile.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmreinhold/hoozoo.git"
+  },
+  "author": "creinhold <christian.reinhold@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cmreinhold/hoozoo/issues"
+  },
+  "homepage": "https://github.com/cmreinhold/hoozoo#readme"
 }

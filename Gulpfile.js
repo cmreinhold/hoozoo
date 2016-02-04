@@ -1,9 +1,12 @@
 // Util
 var gulp =require('gulp');
+var gutil = require('gulp-util');
+var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var connect = require('gulp-connect');
 var minifyCss = require('gulp-minify-css');
+var prettify = require('gulp-prettify');
 var uglify = require('gulp-uglify');
 
 // Plugins
@@ -14,17 +17,25 @@ var imagemin = require('gulp-imagemin');
 var annotate = require('gulp-ng-annotate')
 
 var p = {
+  html: {
+    src:'*.html',
+    dest:'build/'
+  },
   sass: {
     src:'public/sass/main.scss',
-    dest:'build/public/style/'
+    dest:'build/public/css/'
   },
   scripts: {
-    coffee: 'public/scripts/main.coffee',
-    js: 'public/scripts/main.js',
+    src: 'public/scripts/main.js',
+    coffee: [
+      'public/scripts/main.coffee',
+      'public/scripts/tagline.coffee'],
+    js: [
+      'public/scripts/template.js'],
     dest: 'build/public/scripts/'
   },
   jade: {
-    src: 'jade/*.jade',
+    src: 'components/jade/*.jade',
     dest: 'build/' 
   }
 }
@@ -42,7 +53,7 @@ gulp.task('connect', function() {
 gulp.task('compass', function() {
   gulp.src(p.sass.src)
     .pipe(compass({
-      css: 'build/public/style',
+      css: 'build/public/css',
       sass: 'public/sass', 
       require: ['susy', 'breakpoint', 'modular-scale'],
       sourcemap: true
@@ -54,25 +65,6 @@ gulp.task('compass', function() {
     .pipe(gulp.dest(p.sass.dest))
     .pipe(connect.reload())
 }) 
-
-// Coffee
-gulp.task('browserify', function() {
-  
-    gulp.src(p.scripts.src, {read: false})  
-  
-  
-    .pipe(plumber())
-    .pipe(browserify({
-      
-      transform: ['coffeeify'],
-      extensions: ['.coffee']
-      
-    }))
-    .pipe(rename('main.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest(p.scripts.dest))
-    .pipe(connect.reload())
-})
 
 // Jade
 gulp.task('jade', function() {
@@ -92,15 +84,49 @@ gulp.task('images', function() {
     .pipe(connect.reload())
 })
 
+// Javascript
+gulp.task('js', function() {
+  gulp.src(p.js)
+    .pipe(concat('script.js'))
+    .pipe(browserify())
+    //.pipe(uglify())
+    .pipe(gulp.dest('build/public/js/'))
+    .pipe(connect.reload())
+})
+
+// Coffee
+gulp.task('browserify', function() {
+  
+    gulp.src(p.scripts.src, {read: false})  
+
+    .pipe(plumber())
+    .pipe(browserify({
+      transform: ['coffeeify'],
+      extensions: ['.coffee']
+    }))
+    .pipe(rename('main.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest(p.scripts.dest))
+    .pipe(connect.reload())
+})
+
 // Watch
 gulp.task('watch', function() {
-  gulp.watch('public/sass/**/*.scss', ['compass']);
   gulp.watch('jade/**/*.jade', ['jade']);
+  gulp.watch('public/sass/**/*.scss', ['compass']);
+  gulp.watch('public/coffee/**/*', ['browserify']);
   gulp.watch('public/scripts/**/*', ['browserify']);
   gulp.watch('public/images/**',['images']);
 })
 
+
+gulp.task('prettify', function() {
+  gulp.src(p.html.src)
+    .pipe(prettify({indent_size: 2}))
+    .pipe(gulp.dest(p.html.dest))
+});
+
 // Go
-gulp.task('default', ['connect','jade', 'compass', 'browserify', 'images', 'watch'], function() {
+gulp.task('default', ['connect','jade', 'compass', 'browserify', 'images', 'prettify','watch'], function() {
   console.log('Starting gulp!')
 })
