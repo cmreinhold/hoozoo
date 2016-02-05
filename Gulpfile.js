@@ -1,35 +1,38 @@
 // Util
-var gulp =require('gulp');
-var gutil = require('gulp-util');
-var concat = require('gulp-concat');
-var plumber = require('gulp-plumber');
-var rename = require('gulp-rename');
-var connect = require('gulp-connect');
-var minifyHtml = require('gulp-minify-html');
-var minifyCss = require('gulp-minify-css');
-var prettify = require('gulp-prettify');
-var uglify = require('gulp-uglify');
+var gulp =require('gulp'),
+    gulpif = require('gulp-if'),
+    gutil = require('gulp-util'),
+    concat = require('gulp-concat'),
+    plumber = require('gulp-plumber'),
+    rename = require('gulp-rename'),
+    connect = require('gulp-connect'),
+    minifyHtml = require('gulp-minify-html'),
+    minifyCss = require('gulp-minify-css'),
+    prettify = require('gulp-prettify'),
+    uglify = require('gulp-uglify');
 
 // Plugins
-var compass = require('gulp-compass');
-var browserify = require('gulp-browserify');
-var jade = require('gulp-jade');
-var imagemin = require('gulp-imagemin');
-var annotate = require('gulp-ng-annotate');
+var compass = require('gulp-compass'),
+    browserify = require('gulp-browserify'),
+    jade = require('gulp-jade'),
+    imagemin = require('gulp-imagemin'),
+    annotate = require('gulp-ng-annotate');
 
-var env, server, destDir, p;
-
-env = process.env.NODE_ENV || 'production';
+var env = process.env.NODE_ENV || 'production';
+var server, destDir, dataIn, dataOut, jsonDest, p;
 
 var updateConstants = function(){
+  dataIn = destDir + '/data';
   p = {
     html: {
       src:'*.html',
-      dest: destDir
+      dest: destDir + ''
     },
-    sass: {
-      src:'public/sass/main.scss',
-      dest: destDir + '/css/'
+    json: {
+      src:'data/json/*.json',
+      dest: dataIn + '/*.json',
+      din : dataIn + '/*.json',
+      dout: dataOut + '/*.json',
     },
     scripts: {
       src: 'public/scripts/main.js',
@@ -37,8 +40,13 @@ var updateConstants = function(){
         'public/scripts/main.coffee',
         'public/scripts/tagline.coffee'],
       js: [
-        'public/scripts/template.js'],
+        'public/scripts/template.js'
+        ],
       dest: destDir + '/scripts/'
+    },
+    sass: {
+      src:'public/sass/main.scss',
+      dest: destDir + '/css/'
     },
     jade: {
       src: 'components/jade/*.jade',
@@ -73,8 +81,8 @@ gulp.task('development-config', function() {
 gulp.task('compass', function() {
   gulp.src(p.sass.src)
     .pipe(compass({
-      css: destDir + '/css',
       sass: 'public/sass', 
+      css: destDir + '/css',
       style: sassStyle,
       require: ['susy', 'breakpoint', 'modular-scale'],
       sourcemap: true
@@ -85,7 +93,7 @@ gulp.task('compass', function() {
     .pipe(minifyCss())
     .pipe(gulp.dest(p.sass.dest))
     .pipe(connect.reload())
-}) 
+});
 
 // Jade
 gulp.task('jade', function() {
@@ -119,12 +127,12 @@ gulp.task('js', function() {
 gulp.task('browserify', function() {
   
     gulp.src(p.scripts.src, {read: false})  
-
-    .pipe(plumber())
-    .pipe(browserify({
-      transform: ['coffeeify'],
-      extensions: ['.coffee']
-    }))
+      .pipe(plumber())
+      .pipe(browserify({
+        transform: ['coffeeify'],
+        extensions: ['.coffee']
+      })
+    )
     .pipe(rename('main.js'))
     .pipe(uglify())
     .pipe(gulp.dest(p.scripts.dest))
@@ -138,12 +146,14 @@ gulp.task('watch', function() {
   gulp.watch('public/coffee/**/*', ['browserify']);
   gulp.watch('public/scripts/**/*', ['browserify']);
   gulp.watch('public/images/**',['images']);
+  gulp.watch(p.html.src, ['html'])
 })
-
 
 gulp.task('html', function() {
   gulp.src(p.html.src)
-    .pipe(prettify({indent_size: 2}))
+    .pipe(gulpif(env === 'production', minifyHtml()))
+    .pipe(gulpif(env === 'test', minifyHtml()))
+    .pipe(gulpif(env === 'development', prettify({indent_size: 2})))
     .pipe(gulp.dest(p.html.dest))
 });
 
@@ -151,12 +161,9 @@ gulp.task('html', function() {
 gulp.task('connect', function() {
   connect.server({
     root: destDir + '/',
-    livereload: true,
-    port: 8000,
     host: server,
-    open: {
-      browser: 'chrome' // if not working OS X browser: 'Google Chrome'
-    }
+    port: 8000,
+    livereload: true
   })
 })
 
@@ -177,10 +184,4 @@ gulp.task('production', ['production-config', 'connect','jade', 'compass', 'brow
 gulp.task('test', ['test-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
   console.log('Starting test gulp!')
 });
-
-
-
-
-
-
 
