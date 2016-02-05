@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "dependencies": {
     "browserify-shim": "^3.8.12",
-    "uniq": "^1.0.1"
+    "uniq": "^1.0.1",
+    "wiredep": "^3.0.0"
   },
   "devDependencies": {
     "browserify": "^13.0.0",
@@ -17,6 +18,7 @@
     "gulp-imagemin": "*",
     "gulp-jade": "*",
     "gulp-jsonminify": "^1.0.0",
+    "gulp-load-plugins": "^1.2.0",
     "gulp-minify-css": "*",
     "gulp-minify-html": "^1.0.5",
     "gulp-ng-annotate": "*",
@@ -26,6 +28,7 @@
     "gulp-uglify": "*",
     "gulp-util": "^3.0.7",
     "jquery": "^2.2.0",
+    "main-bower-files": "^2.11.1",
     "mustache": "^2.2.1",
     "napa": "*",
     "source-map": "^0.5.3"

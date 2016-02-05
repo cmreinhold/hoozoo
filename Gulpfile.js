@@ -20,6 +20,13 @@ var compass = require('gulp-compass'),
     pngcrush = require('imagemin-pngcrush'),
     annotate = require('gulp-ng-annotate');
 
+var plugins = require("gulp-load-plugins")({
+    pattern: ['gulp-*', 'gulp.*', 'main-bower-files'],
+    replaceString: /\bgulp[\-.]/
+});
+
+var wiredep = require('wiredep').stream;
+
 var env = process.env.NODE_ENV || 'production';
 var server, destDir, dataIn, dataOut, jsonDest, p;
 
@@ -56,6 +63,17 @@ var updateConstants = function(){
     }
   };
 }
+
+// wiredep
+
+gulp.task('bower', function () {
+  gulp.src('./src/footer.html')
+    .pipe(wiredep({
+      optional: 'configuration',
+      goes: 'here'
+    }))
+    .pipe(gulp.dest('./dest'));
+});
 
 // Configuration tasks
 gulp.task('production-config', function() {
@@ -122,18 +140,23 @@ gulp.task('images', function() {
     })))
     .pipe(gulp.dest(destDir + '/images/'))
     .pipe(connect.reload())
-})
+});
 
 // Javascript
+
 gulp.task('js', function() {
-  gulp.src(p.js)
-    .pipe(concat('script.js'))
+
+  var jsFiles = ['src/js/*'];
+
+  gulp.src(plugins.mainBowerFiles().concat(jsFiles))
+    .pipe(plugins.filter('*.js'))
+    .pipe(plugins.concat('main.js'))
     .pipe(browserify())
     .pipe(gulpif(env === 'production', uglify()))
     .pipe(gulpif(env === 'test', uglify()))
-    .pipe(gulp.dest(destDir + '/js/'))
-    .pipe(connect.reload())
-})
+    .pipe(gulp.dest(dest + '/js'));
+
+});
 
 // Coffee
 gulp.task('browserify', function() {
