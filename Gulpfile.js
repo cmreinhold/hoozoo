@@ -5,6 +5,7 @@ var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var connect = require('gulp-connect');
+var minifyHtml = require('gulp-minify-html');
 var minifyCss = require('gulp-minify-css');
 var prettify = require('gulp-prettify');
 var uglify = require('gulp-uglify');
@@ -16,53 +17,57 @@ var jade = require('gulp-jade');
 var imagemin = require('gulp-imagemin');
 var annotate = require('gulp-ng-annotate');
 
-var env, server, destDir;
+var env, server, destDir, p;
 
 env = process.env.NODE_ENV || 'production';
 
-if (env==='production') {
+var updateConstants = function(){
+  p = {
+    html: {
+      src:'*.html',
+      dest: destDir
+    },
+    sass: {
+      src:'public/sass/main.scss',
+      dest: destDir + '/css/'
+    },
+    scripts: {
+      src: 'public/scripts/main.js',
+      coffee: [
+        'public/scripts/main.coffee',
+        'public/scripts/tagline.coffee'],
+      js: [
+        'public/scripts/template.js'],
+      dest: destDir + '/scripts/'
+    },
+    jade: {
+      src: 'components/jade/*.jade',
+      dest: destDir + '/'
+    }
+  };
+}
+
+// Configuration tasks
+gulp.task('production-config', function() {
   destDir = 'build/production';
   server = '46.101.23.228';
-  sassStyle = 'compressed'
-}else if (env==='test') {
-  destDir = 'build/test'
+  sassStyle = 'compressed';
+  updateConstants();
+});
+
+gulp.task('test-config', function() {
+  destDir = 'build/test';
   server = '46.101.23.228';
-  sassStyle = 'compressed'
-}else {
+  sassStyle = 'compressed';
+  updateConstants();
+});
+
+gulp.task('development-config', function() {
   destDir = 'build/development'
   server = 'localhost';
-  sassStyle = 'expanded'
-}
-
-if (env==='production') {
-}else if (env==='test') {
-}else {
-  server = 'localhost'
-}
-
-var p = {
-  html: {
-    src:'*.html',
-    dest: destDir
-  },
-  sass: {
-    src:'public/sass/main.scss',
-    dest: destDir + '/css/'
-  },
-  scripts: {
-    src: 'public/scripts/main.js',
-    coffee: [
-      'public/scripts/main.coffee',
-      'public/scripts/tagline.coffee'],
-    js: [
-      'public/scripts/template.js'],
-    dest: destDir + '/scripts/'
-  },
-  jade: {
-    src: 'components/jade/*.jade',
-    dest: 'build/' 
-  }
-}
+  sassStyle = 'expanded';
+  updateConstants();
+});
 
 // Compass
 gulp.task('compass', function() {
@@ -136,17 +141,16 @@ gulp.task('watch', function() {
 })
 
 
-gulp.task('prettify', function() {
+gulp.task('html', function() {
   gulp.src(p.html.src)
     .pipe(prettify({indent_size: 2}))
     .pipe(gulp.dest(p.html.dest))
 });
 
-
 // Livereload
 gulp.task('connect', function() {
   connect.server({
-    root: destDir,
+    root: destDir + '/',
     livereload: true,
     port: 8000,
     host: server,
@@ -156,7 +160,27 @@ gulp.task('connect', function() {
   })
 })
 
-// Go
-gulp.task('default', ['connect','jade', 'compass', 'browserify', 'images', 'prettify','watch'], function() {
+// Runnable tasks
+
+gulp.task('default', ['development-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
   console.log('Starting gulp!')
-})
+});
+
+gulp.task('development', ['development-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+  console.log('Starting development gulp!')
+});
+
+gulp.task('production', ['production-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+  console.log('Starting production gulp!')
+});
+
+gulp.task('test', ['test-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+  console.log('Starting test gulp!')
+});
+
+
+
+
+
+
+

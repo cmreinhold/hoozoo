@@ -14,6 +14,7 @@
     "gulp-imagemin": "*",
     "gulp-jade": "*",
     "gulp-minify-css": "*",
+    "gulp-minify-html": "^1.0.5",
     "gulp-ng-annotate": "*",
     "gulp-plumber": "*",
     "gulp-prettify": "^0.4.0",
