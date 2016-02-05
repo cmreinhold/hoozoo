@@ -10,6 +10,7 @@
     "gulp-compass": "*",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "*",
+    "gulp-if": "^2.0.0",
     "gulp-imagemin": "*",
     "gulp-jade": "*",
     "gulp-minify-css": "*",

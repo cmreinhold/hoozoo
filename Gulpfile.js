@@ -14,21 +14,40 @@ var compass = require('gulp-compass');
 var browserify = require('gulp-browserify');
 var jade = require('gulp-jade');
 var imagemin = require('gulp-imagemin');
-var annotate = require('gulp-ng-annotate')
+var annotate = require('gulp-ng-annotate');
 
-var servers = {
-   test: 'localhost', 
-   dist: '46.101.23.228' 
+var env, server, destDir;
+
+env = process.env.NODE_ENV || 'production';
+
+if (env==='production') {
+  destDir = 'build/production';
+  server = '46.101.23.228';
+  sassStyle = 'compressed'
+}else if (env==='test') {
+  destDir = 'build/test'
+  server = '46.101.23.228';
+  sassStyle = 'compressed'
+}else {
+  destDir = 'build/development'
+  server = 'localhost';
+  sassStyle = 'expanded'
+}
+
+if (env==='production') {
+}else if (env==='test') {
+}else {
+  server = 'localhost'
 }
 
 var p = {
   html: {
     src:'*.html',
-    dest:'build/'
+    dest: destDir
   },
   sass: {
     src:'public/sass/main.scss',
-    dest:'build/public/css/'
+    dest: destDir + '/css/'
   },
   scripts: {
     src: 'public/scripts/main.js',
@@ -37,7 +56,7 @@ var p = {
       'public/scripts/tagline.coffee'],
     js: [
       'public/scripts/template.js'],
-    dest: 'build/public/scripts/'
+    dest: destDir + '/scripts/'
   },
   jade: {
     src: 'components/jade/*.jade',
@@ -49,8 +68,9 @@ var p = {
 gulp.task('compass', function() {
   gulp.src(p.sass.src)
     .pipe(compass({
-      css: 'build/public/css',
+      css: destDir + '/css',
       sass: 'public/sass', 
+      style: sassStyle,
       require: ['susy', 'breakpoint', 'modular-scale'],
       sourcemap: true
     }))
@@ -76,7 +96,7 @@ gulp.task('images', function() {
   gulp.src('public/images/**/*')
     .pipe(plumber())
     .pipe(imagemin())
-    .pipe(gulp.dest('build/public/images/'))
+    .pipe(gulp.dest(destDir + '/images/'))
     .pipe(connect.reload())
 })
 
@@ -85,8 +105,8 @@ gulp.task('js', function() {
   gulp.src(p.js)
     .pipe(concat('script.js'))
     .pipe(browserify())
-    //.pipe(uglify())
-    .pipe(gulp.dest('build/public/js/'))
+    .pipe(gulpif(env === 'production', uglify()))
+    .pipe(gulp.dest(destDir + '/js/'))
     .pipe(connect.reload())
 })
 
@@ -126,10 +146,10 @@ gulp.task('prettify', function() {
 // Livereload
 gulp.task('connect', function() {
   connect.server({
-    root:'build',
+    root: destDir,
     livereload: true,
     port: 8000,
-    host: servers.dist,
+    host: server,
     open: {
       browser: 'chrome' // if not working OS X browser: 'Google Chrome'
     }
