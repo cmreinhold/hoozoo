@@ -1,9 +1,12 @@
 {
   "name": "hoozoo",
   "version": "0.0.0",
-  "dependencies": {},
+  "dependencies": {
+    "browserify-shim": "^3.8.12",
+    "uniq": "^1.0.1"
+  },
   "devDependencies": {
-    "browserify": "*",
+    "browserify": "^13.0.0",
     "coffeeify": "*",
     "gulp": "*",
     "gulp-browserify": "^0.5.1",
@@ -23,7 +26,8 @@
     "gulp-util": "^3.0.7",
     "jquery": "^2.2.0",
     "mustache": "^2.2.1",
-    "napa": "*"
+    "napa": "*",
+    "source-map": "^0.5.3"
   },
   "description": "",
   "main": "Gulpfile.js",
