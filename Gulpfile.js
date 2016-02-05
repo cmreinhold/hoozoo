@@ -8,6 +8,7 @@ var gulp =require('gulp'),
     connect = require('gulp-connect'),
     minifyHtml = require('gulp-minify-html'),
     minifyCss = require('gulp-minify-css'),
+    minifyJson = require('gulp-jsonminify'),
     prettify = require('gulp-prettify'),
     uglify = require('gulp-uglify');
 
@@ -16,6 +17,7 @@ var compass = require('gulp-compass'),
     browserify = require('gulp-browserify'),
     jade = require('gulp-jade'),
     imagemin = require('gulp-imagemin'),
+    pngcrush = require('imagemin-pngcrush'),
     annotate = require('gulp-ng-annotate');
 
 var env = process.env.NODE_ENV || 'production';
@@ -30,7 +32,7 @@ var updateConstants = function(){
     },
     json: {
       src:'data/json/*.json',
-      dest: dataIn + '/*.json',
+      dest: dataIn,
       din : dataIn + '/*.json',
       dout: dataOut + '/*.json',
     },
@@ -108,7 +110,16 @@ gulp.task('jade', function() {
 gulp.task('images', function() {
   gulp.src('public/images/**/*')
     .pipe(plumber())
-    .pipe(imagemin())
+    .pipe(gulpif(env === 'production', imagemin({
+      progressive: true,
+      svgoPlugins: [{ removeViewBos: false }],
+      use: [pngcrush()]
+    })))
+    .pipe(gulpif(env === 'test', imagemin({
+      progressive: true,
+      svgoPlugins: [{ removeViewBos: false }],
+      use: [pngcrush()]
+    })))
     .pipe(gulp.dest(destDir + '/images/'))
     .pipe(connect.reload())
 })
@@ -119,6 +130,7 @@ gulp.task('js', function() {
     .pipe(concat('script.js'))
     .pipe(browserify())
     .pipe(gulpif(env === 'production', uglify()))
+    .pipe(gulpif(env === 'test', uglify()))
     .pipe(gulp.dest(destDir + '/js/'))
     .pipe(connect.reload())
 })
@@ -146,7 +158,8 @@ gulp.task('watch', function() {
   gulp.watch('public/coffee/**/*', ['browserify']);
   gulp.watch('public/scripts/**/*', ['browserify']);
   gulp.watch('public/images/**',['images']);
-  gulp.watch(p.html.src, ['html'])
+  gulp.watch(p.html.dest + '**/*.html', ['html']);
+  gulp.watch(p.json.dest + '/data/**/*', ['json']);
 })
 
 gulp.task('html', function() {
@@ -155,6 +168,13 @@ gulp.task('html', function() {
     .pipe(gulpif(env === 'test', minifyHtml()))
     .pipe(gulpif(env === 'development', prettify({indent_size: 2})))
     .pipe(gulp.dest(p.html.dest))
+});
+
+gulp.task('json', function() {
+  gulp.src(p.json.src)
+    .pipe(gulpif(env === 'production', minifyJson()))
+    .pipe(gulpif(env === 'test', minifyJson()))
+    .pipe(gulp.dest(p.json.dest))
 });
 
 // Livereload
@@ -169,19 +189,19 @@ gulp.task('connect', function() {
 
 // Runnable tasks
 
-gulp.task('default', ['development-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+gulp.task('default', ['development-config', 'html', 'json', 'connect','jade', 'compass', 'browserify', 'images','watch'], function() {
   console.log('Starting gulp!')
 });
 
-gulp.task('development', ['development-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+gulp.task('development', ['development-config', 'html', 'json', 'connect','jade', 'compass', 'browserify', 'images','watch'], function() {
   console.log('Starting development gulp!')
 });
 
-gulp.task('production', ['production-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+gulp.task('production', ['production-config', 'html', 'json', 'connect','jade', 'compass', 'browserify', 'images','watch'], function() {
   console.log('Starting production gulp!')
 });
 
-gulp.task('test', ['test-config', 'connect','jade', 'compass', 'browserify', 'images', 'html','watch'], function() {
+gulp.task('test', ['test-config', 'html', 'json', 'connect','jade', 'compass', 'browserify', 'images','watch'], function() {
   console.log('Starting test gulp!')
 });
 

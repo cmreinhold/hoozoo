@@ -16,6 +16,7 @@
     "gulp-if": "^2.0.0",
     "gulp-imagemin": "*",
     "gulp-jade": "*",
+    "gulp-jsonminify": "^1.0.0",
     "gulp-minify-css": "*",
     "gulp-minify-html": "^1.0.5",
     "gulp-ng-annotate": "*",
