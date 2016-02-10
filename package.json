@@ -27,6 +27,7 @@
     "gulp-rename": "*",
     "gulp-uglify": "*",
     "gulp-util": "^3.0.7",
+    "imagemin-pngcrush": "^4.1.0",
     "jquery": "^2.2.0",
     "main-bower-files": "^2.11.1",
     "mustache": "^2.2.1",
